@@ -105,22 +105,18 @@ DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
 #include <ntddk.h>
 #include <wdf.h>
 
-VOID UnLoad(WDFDRIVER Driver) {
-	DbgPrint("Driver Unload\n");
+VOID UnLoad(PDRIVER_OBJECT Driver) {
+	KdPrint(("Driver Unload\n"));
+	
 }
 
 extern "C"
-NTSTATUS
-DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
-	const wchar_t *DriverLoadPath = L"C:/testdriver/LoadDriver.sys";
-	DbgPrint("Driver Loader\n");
-	DbgPrint("Driver base=0x%p\n", DriverObject);
-	DbgPrint("Driver IRQL=0x%d\n", KeGetCurrentIrql());
-	WDF_DRIVER_CONFIG config;
-	config.EvtDriverUnload = UnLoad;
-	WDF_DRIVER_CONFIG_INIT(&config, NULL);
-	NTSTATUS status = WdfDriverCreate(DriverObject, RegistryPath, WDF_NO_OBJECT_ATTRIBUTES, &config, WDF_NO_HANDLE);
-	return status;
+NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
+	KdPrint(("Driver Loader\n"));
+	KdPrint(("Driver base=0x%p\n", DriverObject));
+	KdPrint(("Driver IRQL=0x%d\n", KeGetCurrentIrql()));
+	DriverObject->DriverUnload = (PDRIVER_UNLOAD)UnLoad;
+	return STATUS_SUCCESS;
 }
 ```
 
